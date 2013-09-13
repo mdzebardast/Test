@@ -28,17 +28,68 @@
 <link rel="stylesheet" href="css/light/light.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="css/nivo-slider.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/ui_minified/jquery-ui.min.css" type="text/css" media="screen" />
 
 <link rel="stylesheet" href="css/images/main.css" type="text/css" />
 
 <script type="text/javascript" src="js/jquery-1.9.0.min.js"></script>
 <script type="text/javascript" src="js/jquery.nivo.slider.pack.js"></script>
+
+<script src="js/ui/jquery.ui.core.js"></script>
+<script src="js/ui/jquery.ui.widget.js"></script>
+<script src="js/ui/jquery.ui.position.js"></script>
+<script src="js/ui/jquery.ui.menu.js"></script>
+<script src="js/ui/jquery.ui.autocomplete.js"></script>
+
+<script src="js/showposition.js"></script>
+
+
+
+
 <script type="text/javascript">
-    $(window).load(function() {
+    $(document).ready(function() {
         $('#slider').nivoSlider();
     });
 </script>
 
+<script>
+	$(function() {
+		function log( message ) {
+			$( "#result" ).text( message ).prependTo( "#result" );
+			$( "#result" ).scrollTop( 0 );
+		}
+
+		$( "#positionname" ).autocomplete({
+			source: "search.php",
+			minLength: 2,
+			select: function( event, ui ) {
+			   /*	log( ui.item ?
+					"Selected: " + ui.item.value + " aka " + ui.item.id :
+					"Nothing selected, input was " + this.value );*/
+			}
+		});
+	});
+
+    $(function() {
+
+		$( "#streetname" ).autocomplete({
+			source: "streetsearch.php",
+			minLength: 2,
+			select: function( event, ui ) {
+                 $('#streetid').val(ui.item.id);
+				//log( ui.item ?
+				//	"Selected: " + ui.item.value + " aka " + ui.item.id :
+				//	"Nothing selected, input was " + this.value );
+			}
+		});
+	});
+
+    jQuery.fn.setGroup = function (groupid) {
+        $('#groupid').val(groupid);
+        $('a[name=group]').css({"background-color":"white","width":"40px","height":"30px","border":"0px solid" });
+        $(this).css({"background-color":"yellow","width":"50px","height":"40px","border":"1px solid" });
+    }
+</script>
 
 </head>
 <body dir="rtl">
@@ -53,8 +104,27 @@
          <td id="Right" >
             <?php
                  if (isset($_SESSION['UserName']))
-                    //include("menu.php");
+                    include("menu.php");
+
             ?>
+             <?php
+                 if (!isset($_SESSION['UserName'])):
+             ?>
+                        <div class="Login">
+                         <form method="post"  action="cp/actions.php">
+                            <label class="right">نام کاربري:</label> <input type="text" name="txtname" size="20"  /><br />
+                            <label class="right">کلمه عبور:</label>  <input type="password" name="txtpass" size="20"  /><br />
+                            <input type="hidden" name="from" value="0" />
+                            <input type="hidden" name="act" value="0" />
+                            <label ><?php echo $_SESSION['Error']; $_SESSION['Error']="";?> </label><br />
+
+                            <input type="submit" name="btnlogin" value="ورود" class="right"/>  <br /> <br />
+
+                            <label class="right registeruser"><a href="users.php" > ثبت نام </a></label>
+
+                         </form>
+                        </div>
+            <?php endif; ?>
             <br />
         </td>
 
@@ -63,16 +133,36 @@
 
         <td id="Main">
         <div>
-             <div class="address"><div class="name"><?php if(isset($_SESSION['name'])) echo $_SESSION['name'];?></div>
+             <div class="address"><div class="name"><label> <?php if(isset($_SESSION['name'])) echo $_SESSION['name'];?> </label></div>
                 <form method="post" action="cp/actions.php">
-                    <input type="text" name="posiotionname" placeholder="به دنبال چه هستید؟" size="20"/>
-                    <input type="text" name="streetname" placeholder="نام خیابان" size="20"/>
-                    <input type="image" src="css/images/search.png" align="absmiddle" name="Search">
+
+                        <input type="text" name="positionname" id="positionname" class="ui-widget" placeholder="به دنبال چه هستید؟" size="25" style="margin-left:20px;"/>
+
+                        <input type="text" name="streetname" id="streetname" class="ui-widget" placeholder="نام خیابان" size="20" style="margin-left:20px;"/>
+
+                        <input type="hidden" name="streetid" id="streetid" value="0"/>
+                        <input type="hidden" name="groupid" id="groupid" value="0"/>
+
+                         <input name="from"  value="2" type="hidden"/>
+                         <input name="act"  value="3" type="hidden"/>
+
+
+                    <input type="image" src="css/images/search.png" align="absmiddle" name="Search" onclick="$(this).showposition();return false;">
                 </form>
 
              </div>
-
-
+             <div dir="rtl" style="width:460px;position:relative;right:215px;margin-top:15px">
+                  <a href="#" name="group" onclick="$(this).setGroup(1)"><img border="0" src="css/images/buy.png"></a>
+                  <a href="#" name="group" onclick="$(this).setGroup(2)"><img border="0" src="css/images/auto.png"></a>
+                  <a href="#" name="group" onclick="$(this).setGroup(3)"><img border="0" src="css/images/clothes.png"></a>
+                  <a href="#" name="group" onclick="$(this).setGroup(4)"><img border="0" src="css/images/restaurant.png"></a>
+                  <a href="#" name="group" onclick="$(this).setGroup(5)"><img border="0" src="css/images/hospital.png"></a>
+                  <a href="#" name="group" onclick="$(this).setGroup(6)"><img border="0" src="css/images/barber.png"></a>
+                  <a href="#" name="group" onclick="$(this).setGroup(7)"><img border="0" src="css/images/health.png"></a>
+                  <a href="#" name="group" onclick="$(this).setGroup(8)"><img border="0" src="css/images/people.png"></a>
+                  <a href="#" name="group" onclick="$(this).setGroup(9)"><img border="0" src="css/images/sport.png"></a>
+             </div>
+<!--
                 <div class="position">
                     <label> رستوران رانا </label><hr />
                         <ul class="information">
@@ -93,11 +183,17 @@
                             <img src="images/nemo.jpg" data-thumb="images/nemo.jpg" alt="" title="#htmlcaption" />
                         </div>
                     </div>
-                    <hr />
+
+                </div>    <!--End of posiotion-->
+
+              <div id="result">
+
               </div>
 
-
          </div>
+
+
+
         </td>
 
          <!-- Left -->

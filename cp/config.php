@@ -5,7 +5,7 @@ $dbname="jaajoor";
 $dbun="root";
 $dbpw="";
 //-----------
-$link=mysql_connect($dbserver,$dbun,$dbpw);// or die("Invalid query: " . mysql_error());
+$link=mysql_pconnect($dbserver,$dbun,$dbpw);// or die("Invalid query: " . mysql_error());
 if (!$link)
 	{exit;}
 mysql_select_db($dbname,$link);// or die("Invalid query: " . mysql_error());

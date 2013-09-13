@@ -1,6 +1,14 @@
 <?php
-     session_set_cookie_params(0,"./".basename(getcwd())."/");
      session_start();
+     $ClientString = $_SERVER['HTTP_USER_AGENT'] .$_SERVER['REMOTE_ADDR'];
+        if( !isset( $_SESSION['UserName']) || $_SESSION['ClientStr'] != md5(
+            $ClientString))
+    {
+      header( "location: ../index.php" );
+      exit();
+    }
+
+
      if(!isset($_SESSION['Error'])){
         $_SESSION['Error']="";
      }
@@ -9,6 +17,7 @@
         $_SESSION['UserName']=Null;    //destroy variable
         $_SESSION['Error']=Null;
         session_destroy();
+        header( "location: ../index.php" );
     }
     include("functions.php");
 
@@ -52,17 +61,23 @@
         <div>
              <div class="address"><div class="name"><?php if(isset($_SESSION['name'])) echo $_SESSION['name'];?></div>
                 <pre>ايجاد موقعيت</pre>
-             </div>   
+             </div>
 
              <center>
-
-                	<fieldset dir="rtl" style="width:500px; background-color: #EAEAEA">
+                     <?php if(isset($_SESSION['position'])) echo "<div class='message'>" . $_SESSION['position'] ."</div>";  // <!--show a message from action -->
+                           $_SESSION['position']="";
+                     ?>
+                	<fieldset dir="rtl" style="width:500px; background-color: #EAEAEA;border-radius:15px;">
 						  <legend><img src="">ایجاد موقعیت</legend>
-						  <form method="post" action="actions.php" enctype="multipart/form-data">
+						  <form method="post" action="actions.php" enctype="multipart/form-data" >
 						  <table>
 							  <tbody><tr>
+
 								  <td>نام مکان</td>
-								  <td><input name="locname" id="locname" type="text"></td>
+								  <td><input name="locname" id="locname" type="text" size="50"/>  <label id="locnameinfo" class="mandatory">*</label>
+                                      <input name="act"  value="1" type="hidden"/>
+                                      <input name="from"  value="1" type="hidden"/>
+                                  </td>
 							  </tr>
 							  <tr>
 								  <td>منطقه</td>
@@ -87,7 +102,7 @@
 										  <option value="18">منطقه 18</option>
                                           <option value="19">منطقه 19</option>
                                           <option value="20">منطقه 20</option>
-									  </select>
+									  </select>                                        <label id="regioninfo"  class="mandatory">*</label>
 								  </td>
 							  </tr>
 							  <tr>
@@ -95,12 +110,12 @@
 								  <td>
       								  <select name="street" style="width: 150px;">
                                               <?php showregion(); ?>
- 	    							  </select>
-								  </td>
+ 	    							  </select>                                        <label id="streetinfo"  class="mandatory">*</label>
+                                  </td>
 							  </tr>
 							  <tr>
 								  <td>لینک</td>
-								  <td><input name="link" placeholder="www.domain.com" type="text"></td>
+								  <td><input name="site" placeholder="www.domain.com" type="text"></td>
 							  </tr>
 							  <tr>
 								  <td>تلفن</td>
@@ -116,51 +131,50 @@
 							  </tr>
 							  <tr>
 								  <td>نام مسئول</td>
-								  <td><input name="manager" type="text"></td>
+								  <td><input name="manager" type="text" size="30">    <label id="managerinfo"  class="mandatory">*</label> </td>
 							  </tr>
                               <tr style="border: 1px solid #E0E0E0">
                               	<td> عکس </td>
-                              	<td> عکس لوگو    <input name="logopic" type="file">
-                                <fieldset>
-                                    <table>
-                                     <tr>
-                                        <td>عکس اول</td>
-                                  	    <td><input name="pic1" type="file"></td>
-                                     </tr>
-                                     <tr>
-                                        <td>عکس دوم</td>
-                                  	    <td><input name="pic2" type="file"></td>
-                                     </tr>
-                                     <tr>
-                                        <td>عکس سوم</td>
-                                  	    <td><input name="pic3" type="file"></td>
-                                     </tr>
-                                    </table>
+                              	<td> عکس لوگو    <input name="logopic" type="file">       <label id="logopicinfo"  class="mandatory">*</label>
+                                  <fieldset>
+                                      <table>
+                                       <tr>
+                                          <td>عکس اول</td>
+                                    	    <td><input name="pic1" type="file">          <label id="pic1info"  class="mandatory">*</label>      </td>
+                                       </tr>
+                                       <tr>
+                                          <td>عکس دوم</td>
+                                    	    <td><input name="pic2" type="file">          <label id="pic2sinfo"  class="mandatory">*</label>     </td>
+                                       </tr>
+                                       <tr>
+                                          <td>عکس سوم</td>
+                                    	    <td><input name="pic3" type="file">          <label id="pic3info"  class="mandatory">*</label>      </td>
+                                       </tr>
+                                      </table>
 
-                                </fieldset>
+                                  </fieldset>
                                 </td>
                               </tr>
 							  <tr>
 								  <td>آدرس</td>
-								  <td><textarea cols="30" rows="4" name="address"></textarea></td>
+								  <td><textarea cols="30" rows="4" name="address"></textarea>   <label id="streetinfo"  class="mandatory">*</label>    </td>
 							  </tr>
                               <tr>
 								  <td>کلمات کليدي</td>
-								  <td><textarea cols="30" rows="4" name="keywords"></textarea></td>
+								  <td><textarea cols="30" rows="4" name="keywords"></textarea>       <label id="streetinfo"  class="mandatory">*</label>   </td>
 							  </tr>
 							  <tr>
 								  <td valign="top">زیر گروه ها</td>
-								  <td>
-										  <input name="label[]" value="7" type="checkbox">
-										  تئاتر - سینما<br>										  </label>
-										  										  <label>
-										  <input name="label[]" value="18" type="checkbox">
-										  موبایل - لوازم الکترونیکی<br>										  </label>
+								  <td><div >
+                                          <?php showsubgroup(); ?>
+                                      </div>
                 				  </td>
 							  </tr>
 							  <tr>
 								  <td></td>
-								  <td><input name="AddLoc" value="ایجاد موقعیت" type="submit"></td>
+								  <td>  <br />
+                                        <pre>        <input name="AddLoc" value="ایجاد موقعیت" type="submit"></pre>
+                                  </td>
 							  </tr>
                               <tr>
 
